@@ -1,0 +1,14 @@
+# Vscode settings
+.vscode
+
+# Python files
+__pycache__
+
+# Envs
+.env
+.venv
+
+# Logs and temporary files
+logs
+log
+data
