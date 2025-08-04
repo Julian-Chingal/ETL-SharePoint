@@ -203,7 +203,7 @@ class DataLoader:
             
             # Si no se especifican columnas clave, usar todas las columnas excepto metadatos
             if key_columns is None:
-                key_columns = [col for col in df.columns if col not in ['fecha_actualizacion', 'id']]
+                return False
             
             self.logger.info(f"Procesando {len(df)} registros para tabla {table_name}")
             self.logger.info(f"Columnas clave para duplicados: {key_columns}")
@@ -217,6 +217,10 @@ class DataLoader:
             if new_records.empty:
                 self.logger.info("No hay registros nuevos para insertar")
                 return True
+        
+            #? Debugging output
+            print(key_columns)
+            print( new_records)
             
             # Insertar solo registros nuevos
             new_records.to_sql(

@@ -22,12 +22,12 @@ automatizacion/
 │   ├── extractors/
 │   │   ├── __init__.py
 │   │   └── sharepoint_extractor.py  # Extractor de SharePoint
-│   ├── transformers/
+│   ├── processors/
 │   │   ├── __init__.py
-│   │   ├── excel_transformer.py     # Transformador de Excel
-│   │   └── exportaciones.py
+│   │   ├── base_processor.py     # Transformador de Excel
 │   ├── loaders/
 │   │   ├── __init__.py
+|   |   |   excel_transformer.py
 │   │   └── data_loader.py           # Cargador de datos
 │   ├── utils/
 │   │   ├── __init__.py
@@ -79,7 +79,11 @@ SHAREPOINT_PASSWORD=tu_contraseña
 SHAREPOINT_FOLDER_PATH=/sites/tusite/Shared Documents/TuCarpeta
 
 # Database Configuration
-DATABASE_URL=mssql+pyodbc://usuario:contraseña@servidor:puerto/basededatos?driver=ODBC+Driver+17+for+SQL+Server
+DATABASE_HOST=localhost
+DATABASE_PORT=3306
+DATABASE_NAME=mysql
+DATABASE_USER=root
+DATABASE_PASSWORD=root
 
 # Logging Configuration
 LOGGING_LEVEL=INFO
@@ -87,19 +91,13 @@ LOGGING_LEVEL=INFO
 
 ## 🔧 Configuración de Base de Datos
 
-### SQL Server
+### MySql
 ```env
-DATABASE_URL=mssql+pyodbc://usuario:contraseña@servidor:puerto/basededatos?driver=ODBC+Driver+17+for+SQL+Server
-```
-
-### PostgreSQL
-```env
-DATABASE_URL=postgresql://usuario:contraseña@servidor:puerto/basededatos
-```
-
-### SQLite (para pruebas)
-```env
-DATABASE_URL=sqlite:///data/database.db
+DATABASE_HOST=localhost
+DATABASE_PORT=3306
+DATABASE_NAME=mysql
+DATABASE_USER=root
+DATABASE_PASSWORD=root
 ```
 
 ## 🚀 Uso
@@ -238,12 +236,3 @@ Para soporte técnico:
 - Revisar logs en `logs/etl_process.log`
 - Ejecutar `test_local.py` para diagnóstico
 - Verificar configuración con `python setup.py`
-
-## 🔮 Próximas Características
-
-- [ ] Interfaz web para monitoreo
-- [ ] Programación automática (scheduler)
-- [ ] Notificaciones por email
-- [ ] API REST para consultas
-- [ ] Dashboard de métricas
-- [ ] Versionado de datos

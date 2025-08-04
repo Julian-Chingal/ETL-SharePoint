@@ -99,9 +99,6 @@ class ComercioServiciosProcessor(BaseProcessor):
             self.logger.info(f"Transformación de comercio servicios: {df_clean.shape[0]} filas, {df_clean.shape[1]} columnas")
             print(f"Transformación final: {df_clean.shape[0]} filas, {df_clean.shape[1]} columnas")
             
-            # Agregar metadatos
-            df_clean['fecha_actualizacion'] = pd.Timestamp.now()
-            
             self.logger.info(f"Datos de comercio servicios transformados: {len(df_clean)} filas")
             return df_clean
             
