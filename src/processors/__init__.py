@@ -1,4 +1,4 @@
-from .comercio_servicios_processor_corrected import ComercioServiciosProcessor
+from .comercio_servicios_processor import ComercioServiciosProcessor
 
 class ProcessorFactory:
     @staticmethod
