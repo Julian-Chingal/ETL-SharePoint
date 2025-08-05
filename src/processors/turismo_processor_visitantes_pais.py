@@ -17,7 +17,7 @@ class TurismoVisitantesPaisProcessor(BaseProcessor):
         return {
             'header': 10,
             'skipfooter': 5,
-            'sheet_name': 'Visitantes Pais de Residencia',  # Leer todas las hojas
+            'sheet_name': 'Visitantes Pais de Residencia',
         }
 
     def transform_data(self, df: pd.DataFrame) -> pd.DataFrame:

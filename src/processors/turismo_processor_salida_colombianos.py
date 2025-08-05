@@ -17,7 +17,7 @@ class TurismoSalidaColombianosProcessor(BaseProcessor):
         return {
             'header': 10,
             'skipfooter': 3,
-            'sheet_name': 'Salidas colombianos',  # Leer todas las hojas
+            'sheet_name': 'Salidas colombianos', 
         }
 
     def transform_data(self, df: pd.DataFrame) -> pd.DataFrame:
