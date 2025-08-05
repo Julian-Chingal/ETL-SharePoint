@@ -3,12 +3,12 @@ from typing import Dict, Any, List
 import pandas as pd
 import traceback
 
-class TurismoProcessor(BaseProcessor): 
+class TurismoVisitantesPaisProcessor(BaseProcessor): 
     def get_table_name(self) -> str:
-        return "salida_colombianos_turismo"
+        return "visitantes_pais_residencia_turismo"
 
     def get_key_columns(self) -> List[str]:
-        return ["anio", "mes", "pais"]
+        return ["anio", "mes", "pais", "continente_omt"]
 
     def get_file_patterns(self) -> List[str]:
         return ["OEE", "AV", "ESTADISTICAS", "TURISMO", "xlsx"]
@@ -16,8 +16,8 @@ class TurismoProcessor(BaseProcessor):
     def get_read_params(self) -> Dict[str, Any]:
         return {
             'header': 10,
-            'skipfooter': 3,
-            'sheet_name': 'Salidas colombianos',  # Leer todas las hojas
+            'skipfooter': 5,
+            'sheet_name': 'Visitantes Pais de Residencia',  # Leer todas las hojas
         }
 
     def transform_data(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -31,6 +31,7 @@ class TurismoProcessor(BaseProcessor):
                 'Mes': 'mes',
                 'País': 'pais',
                 'Pais': 'pais',  # Sin tilde
+                'Continente OMT': 'continente_omt',
                 'Viajeros': 'viajeros'
             }
 
@@ -38,6 +39,7 @@ class TurismoProcessor(BaseProcessor):
                 'anio',
                 'mes',
                 'pais', 
+                'continente_omt',
                 'viajeros'
             }
 
@@ -134,7 +136,16 @@ class TurismoProcessor(BaseProcessor):
                     removed = initial_count - final_count
                     self.logger.info(f"Eliminadas {removed} filas con valores de viajeros inválidos")
             
-            # 4. Normalizar nombres de países
+            # 5. Validar continente OMT
+            if 'continente_omt' in df_clean.columns:
+                # Normalizar nombres de continentes
+                df_clean['continente_omt'] = df_clean['continente_omt'].astype(str).str.strip().str.title()
+                
+                # Eliminar continentes vacíos
+                df_clean = df_clean[df_clean['continente_omt'] != '']
+                df_clean = df_clean[df_clean['continente_omt'] != 'Nan']
+
+            # 6. Normalizar nombres de países
             if 'pais' in df_clean.columns:
                 df_clean['pais'] = df_clean['pais'].astype(str).str.strip()
                 df_clean['pais'] = df_clean['pais'].str.title()  # Capitalizar apropiadamente
@@ -142,15 +153,6 @@ class TurismoProcessor(BaseProcessor):
                 # Eliminar países vacíos
                 df_clean = df_clean[df_clean['pais'] != '']
                 df_clean = df_clean[df_clean['pais'] != 'Nan']
-            
-            # 5. Eliminar duplicados
-            initial_count = len(df_clean)
-            df_clean = df_clean.drop_duplicates(subset=['periodo_mes', 'pais'], keep='first')
-            final_count = len(df_clean)
-            
-            if final_count < initial_count:
-                duplicates = initial_count - final_count
-                self.logger.info(f"Eliminados {duplicates} registros duplicados")
             
             self.logger.info(f"Datos de turismo validados: {len(df_clean)} filas")
             return df_clean
