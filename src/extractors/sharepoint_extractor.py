@@ -194,8 +194,7 @@ class SharePointExtractor:
                 
                 file_stream = BytesIO(content_bytes)
                 self.logger.info(f"Archivo {file_name} descargado: {len(content_bytes)} bytes")
-                
-                print(file_stream)
+        
                 return file_stream
                 
             except Exception as e:

@@ -37,8 +37,7 @@ class ComercioServiciosProcessor(BaseProcessor):
             
             # DEBUG: Mostrar columnas originales
             self.logger.info(f"Columnas originales del archivo: {list(df_clean.columns)}")
-            print(f"Columnas originales: {list(df_clean.columns)}")
-            
+
             # Eliminar filas donde la primera columna esté vacía (texto al final)
             if not df_clean.empty:
                 first_col = df_clean.columns[0]
@@ -63,8 +62,7 @@ class ComercioServiciosProcessor(BaseProcessor):
             # DEBUG: Mostrar qué mapeos existen
             existing_mappings = {k: v for k, v in column_mapping.items() if k in df_clean.columns}
             self.logger.info(f"Mapeos encontrados: {existing_mappings}")
-            print(f"Mapeos encontrados: {existing_mappings}")
-            
+
             # Si no hay mapeos exactos, intentar mapeo flexible
             if not existing_mappings:
                 self.logger.warning("No se encontraron mapeos exactos. Intentando mapeo flexible...")

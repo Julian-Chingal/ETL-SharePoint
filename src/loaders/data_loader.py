@@ -160,7 +160,7 @@ class DataLoader:
             existing_data_temp['_temp_key'] = existing_data_keys.apply(
                 lambda row: '|'.join(row.astype(str)), axis=1
             )
-            
+
             # Filtrar solo registros nuevos
             new_records = new_data_temp[~new_data_temp['_temp_key'].isin(existing_data_temp['_temp_key'])].copy()
             
@@ -218,8 +218,9 @@ class DataLoader:
                 self.logger.info("No hay registros nuevos para insertar")
                 return True
         
-            #? Debugging output
-            print(key_columns)
+            #! Debugging output
+            print("---------------------------------------------------------")
+            print(existing_data)
             print( new_records)
             
             # Insertar solo registros nuevos
