@@ -35,12 +35,35 @@ class ETLManager:
             
             self.logger.info(f"Procesando carpeta: {folder_name}")
             
-            # Obtener procesador específico
-            processor_class = ProcessorFactory.get_processor(folder_name)
-            if not processor_class:
+            # Obtener procesador(es) específico(s)
+            processor_classes = ProcessorFactory.get_processor(folder_name)
+            if not processor_classes:
                 self.logger.warning(f"No hay procesador para {folder_name}, saltando...")
                 continue
             
+            # Manejar múltiples procesadores
+            if isinstance(processor_classes, list):
+                folder_success = True
+                for processor_class in processor_classes:
+                    success = self._process_with_single_processor(processor_class, folder_path, folder_name)
+                    if not success:
+                        folder_success = False
+                results[folder_name] = folder_success
+            else:
+                # Procesador único
+                success = self._process_with_single_processor(processor_classes, folder_path, folder_name)
+                results[folder_name] = success
+            
+            if results[folder_name]:
+                self.logger.info(f"✓ {folder_name} procesado exitosamente")
+            else:
+                self.logger.error(f"✗ Error procesando {folder_name}")
+        
+        return results
+    
+    def _process_with_single_processor(self, processor_class, folder_path: str, folder_name: str) -> bool:
+        """Procesa una carpeta con un procesador específico"""
+        try:
             # Crear instancia del procesador
             processor = processor_class(
                 self.extractor, 
@@ -49,29 +72,38 @@ class ETLManager:
                 self.logger
             )
             
+            processor_name = processor_class.__name__
+            self.logger.info(f"Ejecutando {processor_name} para {folder_name}")
+            
             # Ejecutar proceso ETL
             success = processor.process_folder(folder_path)
-            results[folder_name] = success
             
             if success:
-                self.logger.info(f"✓ {folder_name} procesado exitosamente")
+                self.logger.info(f"✓ {processor_name} completado exitosamente")
             else:
-                self.logger.error(f"✗ Error procesando {folder_name}")
-        
-        return results
+                self.logger.error(f"✗ Error en {processor_name}")
+                
+            return success
+            
+        except Exception as e:
+            self.logger.error(f"Error ejecutando procesador {processor_class.__name__}: {str(e)}")
+            return False
     
     def process_single_folder(self, folder_name: str, folder_path: str) -> bool:
         """Procesa una carpeta específica"""
-        processor_class = ProcessorFactory.get_processor(folder_name)
-        if not processor_class:
+        processor_classes = ProcessorFactory.get_processor(folder_name)
+        if not processor_classes:
             self.logger.error(f"No hay procesador para {folder_name}")
             return False
         
-        processor = processor_class(
-            self.extractor, 
-            self.transformer, 
-            self.loader, 
-            self.logger
-        )
-        
-        return processor.process_folder(folder_path)
+        # Manejar múltiples procesadores
+        if isinstance(processor_classes, list):
+            overall_success = True
+            for processor_class in processor_classes:
+                success = self._process_with_single_processor(processor_class, folder_path, folder_name)
+                if not success:
+                    overall_success = False
+            return overall_success
+        else:
+            # Procesador único
+            return self._process_with_single_processor(processor_classes, folder_path, folder_name)

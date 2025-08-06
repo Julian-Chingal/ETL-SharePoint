@@ -64,7 +64,7 @@ class TurismoSalidaColombianosProcessor(BaseProcessor):
             self.logger.info(f"Datos de turismo transformados: {len(df_clean)} filas")
             return df_clean
         except Exception as e:
-            self.logger.error(f"Error en transform_data para codigo paises: {str(e)}")
+            self.logger.error(f"Error en transform_data para turismo salida de colombianos: {str(e)}")
             self.logger.error(f"Traceback: {traceback.format_exc()}")
             return pd.DataFrame()
     

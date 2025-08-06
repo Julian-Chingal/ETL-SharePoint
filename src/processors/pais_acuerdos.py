@@ -8,7 +8,7 @@ class PaisAcuerdosProcessor(BaseProcessor):
         return "codigo_pais_acuerdos"
     
     def get_file_patterns(self) -> List[str]:
-        return ["Código", "País", "Acuerdos", "xlsx"]
+        return ["Código", "País", "Acuerdos"]
 
     def get_key_columns(self) -> List[str]:
         return ["codigo_pais"]

@@ -5,13 +5,13 @@ import traceback
 
 class IedPaisOrigenProcessor(BaseProcessor):
     def get_table_name(self) -> str:
-        return "ied_pais_origen_inversion"
+        return "ban_rep_inversion"
     
     def get_file_patterns(self) -> List[str]:
         return ["IED por país origen"]
     
     def get_key_columns(self) -> List[str]:
-        return ["cod_pais", "serie", "fecha"]
+        return ["cod_pais", "serie", "fecha", "flujo"]
 
     def get_read_params(self) -> Dict[str, Any]:
         return {
@@ -50,6 +50,7 @@ class IedPaisOrigenProcessor(BaseProcessor):
 
             # Renombrar columnas al formato deseado
             df_melted = df_melted.rename(columns={'COD País': 'cod_pais', 'Serie': 'serie'})
+            df_melted['flujo'] = 'Ext en Col'
 
             # Limpiar nuevamente 'cod_pais' y 'serie' después del melt
             df_melted['cod_pais'] = df_melted['cod_pais'].astype(str).str.strip()
