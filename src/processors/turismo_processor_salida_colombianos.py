@@ -58,10 +58,13 @@ class TurismoSalidaColombianosProcessor(BaseProcessor):
             
             # Filtrar solo las columnas finales
             df_clean = df_clean[existing_columns]
-            df_clean['flujo'] = 'Colombianos en el extranjero'
+            df_clean['flujo'] = 'Col en Ext'
 
             # Aplicar validaciones
             df_clean = self._validate_data(df_clean)
+            if 'anio' in df_clean.columns: # Limpiar año y convertirlo a string
+                df_clean['anio'] = df_clean['anio'].astype(str).str.strip()
+                
             self.logger.info(f"Datos de turismo transformados: {len(df_clean)} filas")
             return df_clean
         except Exception as e:
