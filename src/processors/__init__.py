@@ -12,8 +12,8 @@ class ProcessorFactory:
         processors = {
             # '1-Comercio-Bienes': [ComercioBienesExportacionesProcessor],
             '2-Comercio-Servicios': [ComercioServiciosProcessor],
-            # '3-Inversion': [IedPaisOrigenProcessor, IdcePaisDestinoProcessor],
-            # '4-Turismo': [TurismoSalidaColombianosProcessor,TurismoVisitantesPaisProcessor],
+            '3-Inversion': [IedPaisOrigenProcessor, IdcePaisDestinoProcessor],
+            '4-Turismo': [TurismoSalidaColombianosProcessor,TurismoVisitantesPaisProcessor],
             'Ajustes': [PaisAcuerdosProcessor],
         }
 
