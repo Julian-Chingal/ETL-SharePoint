@@ -5,13 +5,13 @@ import traceback
 
 class TurismoSalidaColombianosProcessor(BaseProcessor): 
     def get_table_name(self) -> str:
-        return "salida_colombianos_turismo"
+        return "visitas_turismo"
 
     def get_key_columns(self) -> List[str]:
-        return ["anio", "mes", "pais"]
+        return ["anio", "mes", "pais", "flujo"]
 
     def get_file_patterns(self) -> List[str]:
-        return ["OEE", "AV", "ESTADISTICAS", "TURISMO", "xlsx"]
+        return ["OEE", "EC", "TURISMO", "xlsx"]
 
     def get_read_params(self) -> Dict[str, Any]:
         return {
@@ -58,6 +58,7 @@ class TurismoSalidaColombianosProcessor(BaseProcessor):
             
             # Filtrar solo las columnas finales
             df_clean = df_clean[existing_columns]
+            df_clean['flujo'] = 'Colombianos en el extranjero'
 
             # Aplicar validaciones
             df_clean = self._validate_data(df_clean)

@@ -5,19 +5,19 @@ import traceback
 
 class TurismoVisitantesPaisProcessor(BaseProcessor): 
     def get_table_name(self) -> str:
-        return "visitantes_pais_residencia_turismo"
+        return "visitas_turismo"
 
     def get_key_columns(self) -> List[str]:
-        return ["anio", "mes", "pais", "continente_omt"]
+        return ["anio", "mes", "pais", "flujo"]
 
     def get_file_patterns(self) -> List[str]:
-        return ["OEE", "AV", "ESTADISTICAS", "TURISMO", "xlsx"]
+        return ["OEE", "EC", "TURISMO", "xlsx"]
 
     def get_read_params(self) -> Dict[str, Any]:
         return {
             'header': 10,
             'skipfooter': 5,
-            'sheet_name': 'Visitantes Pais de Residencia',
+            'sheet_name': 'Extranjeros Pais de Residencia',
         }
 
     def transform_data(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -31,7 +31,6 @@ class TurismoVisitantesPaisProcessor(BaseProcessor):
                 'Mes': 'mes',
                 'País': 'pais',
                 'Pais': 'pais',  # Sin tilde
-                'Continente OMT': 'continente_omt',
                 'Viajeros': 'viajeros'
             }
 
@@ -39,7 +38,6 @@ class TurismoVisitantesPaisProcessor(BaseProcessor):
                 'anio',
                 'mes',
                 'pais', 
-                'continente_omt',
                 'viajeros'
             }
 
@@ -60,6 +58,7 @@ class TurismoVisitantesPaisProcessor(BaseProcessor):
             
             # Filtrar solo las columnas finales
             df_clean = df_clean[existing_columns]
+            df_clean['flujo'] = 'Extrangeros en Colombia'
 
             # Aplicar validaciones
             df_clean = self._validate_data(df_clean)

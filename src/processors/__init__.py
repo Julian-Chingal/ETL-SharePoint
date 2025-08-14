@@ -10,12 +10,11 @@ class ProcessorFactory:
     @staticmethod
     def get_processor(folder_name: str):
         processors = {
-            # '1-Comercio-Bienes': ComercioBienesExportacionesProcessor,
-            # '2-Comercio-Servicios': ComercioServiciosProcessor,
-            '3-Inversion': [IedPaisOrigenProcessor, IdcePaisDestinoProcessor],
-            # '4-Turismo': TurismoSalidaColombianosProcessor,
-            # '4-Turismo': TurismoVisitantesPaisProcessor,
-            'Ajustes': PaisAcuerdosProcessor,
+            # '1-Comercio-Bienes': [ComercioBienesExportacionesProcessor],
+            '2-Comercio-Servicios': [ComercioServiciosProcessor],
+            # '3-Inversion': [IedPaisOrigenProcessor, IdcePaisDestinoProcessor],
+            # '4-Turismo': [TurismoSalidaColombianosProcessor,TurismoVisitantesPaisProcessor],
+            'Ajustes': [PaisAcuerdosProcessor],
         }
 
         return processors.get(folder_name, None)

@@ -22,8 +22,8 @@ class ComercioServiciosProcessor(BaseProcessor):
     def get_read_params(self) -> Dict[str, Any]:
         """Parámetros específicos para leer archivos de comercio de servicios"""
         return {
-            'header': 6,  # Encabezado en fila 7 (índice 6)
-            'skipfooter': 0,  # Sin filas al final a ignorar
+            'header': 6,  
+            'skipfooter': 0, 
         }
 
     def transform_data(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -94,6 +94,9 @@ class ComercioServiciosProcessor(BaseProcessor):
             # Validaciones específicas del dominio
             df_clean = self._validate_comercio_servicios_data(df_clean)
 
+            # Sumar total_miles_dolares
+            df_clean = self._aggregate_duplicates(df_clean)
+
             self.logger.info(f"Transformación de comercio servicios: {df_clean.shape[0]} filas, {df_clean.shape[1]} columnas")
             print(f"Transformación final: {df_clean.shape[0]} filas, {df_clean.shape[1]} columnas")
             
@@ -104,6 +107,61 @@ class ComercioServiciosProcessor(BaseProcessor):
             self.logger.error(f"Error en transform_data para comercio servicios: {str(e)}")
             self.logger.error(f"Traceback: {traceback.format_exc()}")
             return pd.DataFrame()
+    
+    def _aggregate_duplicates(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Agrupa registros duplicados basándose en las columnas clave y suma total_miles_dolares
+        """
+        try:
+            if df.empty or 'total_miles_dolares' not in df.columns:
+                return df
+                
+            # Obtener columnas clave que existen en el DataFrame
+            key_columns = self.get_key_columns()
+            available_key_columns = [col for col in key_columns if col in df.columns]
+            
+            if not available_key_columns:
+                self.logger.warning("No se encontraron columnas clave para agrupación. Retornando datos sin agrupar.")
+                return df
+            
+            # Registrar estado antes de la agrupación
+            rows_before = len(df)
+            self.logger.info(f"Filas antes de agrupar duplicados: {rows_before}")
+            
+            # Identificar columnas para agrupar (todas excepto total_miles_dolares)
+            groupby_columns = [col for col in df.columns if col != 'total_miles_dolares']
+            
+            # Crear un diccionario de agregación
+            # Para total_miles_dolares: suma
+            # Para otras columnas: tomar el primer valor (ya que deberían ser iguales en duplicados)
+            agg_dict = {}
+            for col in df.columns:
+                if col == 'total_miles_dolares':
+                    agg_dict[col] = 'sum'
+                else:
+                    agg_dict[col] = 'first'
+            
+            # Realizar la agrupación
+            df_aggregated = df.groupby(groupby_columns, as_index=False).agg(agg_dict)
+            
+            # Registrar estado después de la agrupación
+            rows_after = len(df_aggregated)
+            duplicates_found = rows_before - rows_after
+            
+            self.logger.info(f"Filas después de agrupar duplicados: {rows_after}")
+            if duplicates_found > 0:
+                self.logger.info(f"Se encontraron y agregaron {duplicates_found} registros duplicados")
+                print(f"Duplicados procesados: {duplicates_found} registros fueron agregados")
+            else:
+                self.logger.info("No se encontraron registros duplicados")
+                print("No se encontraron registros duplicados")
+            
+            return df_aggregated
+            
+        except Exception as e:
+            self.logger.error(f"Error en _aggregate_duplicates: {str(e)}")
+            self.logger.error(f"Traceback: {traceback.format_exc()}")
+            return df
     
     def _create_flexible_mapping(self, columns) -> Dict[str, str]:
         """Crea mapeo flexible basado en contenido de las columnas"""
