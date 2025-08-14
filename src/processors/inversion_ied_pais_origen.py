@@ -74,10 +74,10 @@ class IedPaisOrigenProcessor(BaseProcessor):
             # Reiniciar el índice
             df_melted = df_melted.reset_index(drop=True)
 
-            print(f"Filas después de procesar: {len(df_melted)}")
+            self.logger.info(f"Filas después de procesar: {len(df_melted)}")
             return df_melted
 
         except Exception as e:
-            print(f"Error en transform_data: {str(e)}")
-            print(traceback.format_exc())
+            self.logger.error(f"Error en transform_data: {str(e)}")
+            self.logger.error(f"Traceback: {traceback.format_exc()}")
             raise

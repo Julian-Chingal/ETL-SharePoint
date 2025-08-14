@@ -62,9 +62,8 @@ class TurismoVisitantesPaisProcessor(BaseProcessor):
 
             # Aplicar validaciones
             df_clean = self._validate_data(df_clean)
-
             if 'anio' in df_clean.columns: # Limpiar año y convertirlo a string
-                df_clean['anio'] = df_clean['anio'].astype(str).str.strip()
+                df_clean['anio'] = df_clean['anio'].astype(int).astype(str)
 
             self.logger.info(f"Datos de turismo transformados: {len(df_clean)} filas")
             return df_clean

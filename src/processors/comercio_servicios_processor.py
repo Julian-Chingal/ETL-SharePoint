@@ -80,9 +80,7 @@ class ComercioServiciosProcessor(BaseProcessor):
                 'total_miles_dolares'
             ]
             existing_columns = [col for col in required_columns if col in df_clean.columns]
-            
             self.logger.info(f"Columnas disponibles después del mapeo: {existing_columns}")
-            print(f"Columnas finales disponibles: {existing_columns}")
             
             if not existing_columns:
                 self.logger.error("No se encontraron columnas válidas después del mapeo")
@@ -98,8 +96,6 @@ class ComercioServiciosProcessor(BaseProcessor):
             df_clean = self._aggregate_duplicates(df_clean)
 
             self.logger.info(f"Transformación de comercio servicios: {df_clean.shape[0]} filas, {df_clean.shape[1]} columnas")
-            print(f"Transformación final: {df_clean.shape[0]} filas, {df_clean.shape[1]} columnas")
-            
             self.logger.info(f"Datos de comercio servicios transformados: {len(df_clean)} filas")
             return df_clean
             
@@ -151,10 +147,8 @@ class ComercioServiciosProcessor(BaseProcessor):
             self.logger.info(f"Filas después de agrupar duplicados: {rows_after}")
             if duplicates_found > 0:
                 self.logger.info(f"Se encontraron y agregaron {duplicates_found} registros duplicados")
-                print(f"Duplicados procesados: {duplicates_found} registros fueron agregados")
             else:
                 self.logger.info("No se encontraron registros duplicados")
-                print("No se encontraron registros duplicados")
             
             return df_aggregated
             
@@ -194,51 +188,52 @@ class ComercioServiciosProcessor(BaseProcessor):
     def _validate_comercio_servicios_data(self, df: pd.DataFrame) -> pd.DataFrame:
         """Validaciones específicas para datos de comercio de servicios"""
         try:
+            df_copy = df.copy()
             # Limpiar valores numéricos
             if 'total_miles_dolares' in df.columns:
                 # Reemplazar comas por puntos si es necesario
-                df['total_miles_dolares'] = df['total_miles_dolares'].astype(str).str.replace(',', '.')
-                df['total_miles_dolares'] = pd.to_numeric(
-                    df['total_miles_dolares'], 
+                df_copy['total_miles_dolares'] = df_copy['total_miles_dolares'].astype(str).str.replace(',', '.')
+                df_copy['total_miles_dolares'] = pd.to_numeric(
+                    df_copy['total_miles_dolares'], 
                     errors='coerce'
                 )
                 # Eliminar filas con valores nulos en total_miles_dolares
-                original_count = len(df)
-                df = df.dropna(subset=['total_miles_dolares'])
-                filtered_count = len(df)
+                original_count = len(df_copy)
+                df_copy = df_copy.dropna(subset=['total_miles_dolares'])
+                filtered_count = len(df_copy)
                 if filtered_count < original_count:
                     self.logger.info(f"Filtradas {original_count - filtered_count} filas por valores nulos en total_miles_dolares")
             
             # Validar códigos
             if 'codigo' in df.columns:
-                df['codigo'] = df['codigo'].astype(str).str.strip()
+                df_copy.loc[:, 'codigo'] = df_copy['codigo'].astype(str).str.strip()
                 # Eliminar filas con códigos vacíos
-                original_count = len(df)
-                df = df[df['codigo'] != '']
-                df = df[df['codigo'] != 'nan']
-                df = df[df['codigo'] != 'None']
-                filtered_count = len(df)
+                original_count = len(df_copy)
+                df_copy = df_copy[df_copy['codigo'] != '']
+                df_copy = df_copy[df_copy['codigo'] != 'nan']
+                df_copy = df_copy[df_copy['codigo'] != 'None']
+                filtered_count = len(df_copy)
                 if filtered_count < original_count:
                     self.logger.info(f"Filtradas {original_count - filtered_count} filas por códigos vacíos")
             
             # Limpiar texto
             text_columns = ['flujo_comercial', 'descripcion_cabps', 'nombre_pais', 'nombre_departamento']
             for col in text_columns:
-                if col in df.columns:
-                    df[col] = df[col].astype(str).str.strip()
-                    df[col] = df[col].str.upper()  # Normalizar a mayúsculas
-            
+                if col in df_copy.columns:
+                    df_copy[col] = df_copy[col].astype(str).str.strip()
+                    df_copy[col] = df_copy[col].str.upper()  # Normalizar a mayúsculas
+
             # Validar flujo comercial (debe ser Exportación o Importación)
-            if 'flujo_comercial' in df.columns:
+            if 'flujo_comercial' in df_copy.columns:
                 valid_flows = ['EXPORTACIONES', 'IMPORTACIONES', 'EXPORTACIÓN', 'IMPORTACIÓN', 'EXPORTACION', 'IMPORTACION']
-                original_count = len(df)
-                df = df[df['flujo_comercial'].isin(valid_flows)]
-                filtered_count = len(df)
+                original_count = len(df_copy)
+                df_copy = df_copy[df_copy['flujo_comercial'].isin(valid_flows)]
+                filtered_count = len(df_copy)
                 if filtered_count < original_count:
                     self.logger.info(f"Filtradas {original_count - filtered_count} filas por flujo comercial inválido")
-            
-            return df
-            
+
+            return df_copy
+
         except Exception as e:
             self.logger.error(f"Error en validación de datos: {str(e)}")
-            return df
+            return df_copy
